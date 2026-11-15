@@ -10,7 +10,7 @@ import kotlin.math.max
 
 object ImageUtils {
     /** Loads a photo, fixes its rotation and shrinks it so the longest side is at most [maxSide]. */
-    fun load(ctx: Context, uri: Uri, maxSide: Int = 1280): Bitmap? {
+    fun load(ctx: Context, uri: Uri, maxSide: Int = 960): Bitmap? {
         return try {
             val cr = ctx.contentResolver
             val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
