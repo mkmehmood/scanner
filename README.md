@@ -14,25 +14,17 @@ Everything is graded **on the phone**, with no internet and no account. An optio
 
 A photo cannot judge smell, moisture or chemicals. Always confirm by smell and touch before buying.
 
-## Build
-GitHub Actions builds the APKs (no local setup needed):
+## Build and release
+GitHub Actions builds the app on every commit to `main` and refreshes **one rolling release** (tag `latest`):
 
-| Trigger | Result |
-|---|---|
-| Push to `main`, pull request, or manual run | Debug and release APKs attached to the workflow run (Actions tab, **Artifacts**) |
-| Push a tag such as `v1.0.0` | The same APKs are published on the repository's **Releases** page |
-
-```
-git tag v1.0.0 && git push origin v1.0.0
-```
+- Download **TobaccoScanner-release.apk** from the [latest release](../../releases/tag/latest). The debug APK is there too.
+- Each commit replaces the APKs in that release and moves the `latest` tag to the new commit. There are no other tags.
+- Builds are signed with the release key stored in the repository secrets, so every new APK installs over the previous one (no uninstall needed). The version number goes up with every build.
+- Pull requests only build; they do not touch the release.
 
 Locally (Android SDK 34, JDK 17, Gradle 8.9): `gradle assembleRelease`
 
-## Signing (optional)
-Without secrets, the release APK is signed with the debug key so it installs for testing.
-For a stable release key, add these repository secrets: `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
-
-```
-keytool -genkeypair -v -keystore release.jks -alias scanner -keyalg RSA -keysize 2048 -validity 10000
-base64 -w0 release.jks
-```
+## Signing
+Repository secrets used by the workflow: `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
+Keep a private backup of the keystore: if it is lost, later builds can no longer update installed copies.
+Without these secrets the release APK falls back to the debug key.
